@@ -11,6 +11,7 @@ Array* arr_create();
 Array* arr_new(uint64_t count);
 void arr_free(Array *arr);
 void arr_print(Array *arr);
+void arr_swap(Array *arr1, Array *arr2);
 
 #define arr_at(a, i) a->values[i]
 #define arr_size(a) a->count

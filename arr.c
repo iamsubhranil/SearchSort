@@ -67,3 +67,13 @@ void arr_print(Array *a){
         printf("}");
     }
 }
+
+void arr_swap(Array *arr1, Array *arr2){
+    uint64_t temp = arr_size(arr1);
+    arr_size(arr1) = arr_size(arr2);
+    arr_size(arr2) = temp;
+
+    int64_t *val = arr_elements(arr1);
+    arr_elements(arr1) = arr_elements(arr2);
+    arr_elements(arr2) = val;
+}
