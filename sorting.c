@@ -16,7 +16,7 @@ uint8_t sort_test(Array *arr){
     return 1;
 }
 
-static void swap(int64_t *p1, int64_t *p2){
+static inline void swap(int64_t *p1, int64_t *p2){
     int64_t p3 = *p1;
     *p1 = *p2;
     *p2 = p3;
@@ -96,31 +96,56 @@ static void heap_create2(Array *arr, uint64_t size){
         numChild *= 2;
     }
 outerwhile:;
-    uint64_t start = lastLevel;
+           uint64_t start = lastLevel;
+           while(1){
+               uint64_t children = 0;
+               while(children < numChild){
+                   uint64_t parent = start + children;
+                   uint64_t leftChild = parent * 2 + 1;
+                   uint64_t rightChild = parent * 2 + 2;
+                   int64_t *min = &arr_at(arr, parent);
+                   if(leftChild < size && arr_at(arr, leftChild) < *min){
+                       min = &arr_at(arr, leftChild);
+                   }
+                   if(rightChild < size && arr_at(arr, rightChild) < *min){
+                       min = &arr_at(arr, rightChild);
+                   }
+                   if(*min != arr_at(arr, parent)){
+                       swap(min, &arr_at(arr, parent));
+                       start = lastLevel;
+                       goto outerwhile;
+                   }
+                   children++;
+               }
+               if(start == 0)
+                   break;
+               else
+                   start--;
+           }
+}
+
+void heap_rebuild(Array *arr, uint64_t size){
+    if(size == 1)
+        return;
+    uint64_t j = 0;
     while(1){
-        uint64_t children = 0;
-        while(children < numChild){
-            uint64_t parent = start + children;
-            uint64_t leftChild = parent * 2 + 1;
-            uint64_t rightChild = parent * 2 + 2;
-            int64_t *min = &arr_at(arr, parent);
-            if(leftChild < size && arr_at(arr, leftChild) < *min){
-                min = &arr_at(arr, leftChild);
-            }
-            if(rightChild < size && arr_at(arr, rightChild) < *min){
-                min = &arr_at(arr, rightChild);
-            }
-            if(*min != arr_at(arr, parent)){
-                swap(min, &arr_at(arr, parent));
-                start = lastLevel;
-                goto outerwhile;
-            }
-            children++;
+        uint64_t leftChild = 2 * j + 1, rightChild = 2 * j + 2;
+        uint64_t parent = j, nextCheck = j;
+        int64_t *min = &arr_at(arr, parent);
+        if(leftChild < size && arr_at(arr, leftChild) < *min){
+            min = &arr_at(arr, leftChild);
+            nextCheck = leftChild;
         }
-        if(start == 0)
-            break;
+        if(rightChild < size && arr_at(arr, rightChild) < *min){
+            min = &arr_at(arr, rightChild);
+            nextCheck = rightChild;
+        }
+        if(*min != arr_at(arr, parent)){
+            swap(min, &arr_at(arr, parent));
+            j = nextCheck;
+        }
         else
-            start--;
+            break;
     }
 }
 
@@ -130,29 +155,39 @@ void sort_heap(Array *arr){
     for(uint64_t i = arr_size(arr), j = 0;i > 0;i--, j++){
         arr_at(sorted , j) = arr_at(arr , 0);
         arr_at(arr , 0) = arr_at(arr, i - 1);
-        heap_create2(arr, i - 1);
+        heap_rebuild(arr, i - 1);
     }
     arr_at(sorted, arr_size(sorted) - 1) = arr_at(arr, 0);
-    
+
     arr_swap(sorted, arr);
     arr_free(sorted);
 }
 
+void sort_bubble(Array *arr){
+    for(uint64_t i = 0;i < arr_size(arr) - 1;i++){
+        for(uint64_t j = 0;j < arr_size(arr) - i - 1;j++){
+            if(arr_at(arr, j) > arr_at(arr, j + 1)){
+                swap(&arr_at(arr, j), &arr_at(arr, j + 1));
+            }
+        }
+    }
+}
+
 int main(){
     Array *a = arr_create();
-    printf("\nBefore heap sort : ");
+    printf("\nBefore bubble sort : ");
     arr_print(a);
-    printf("\nPerforming heap sort..\n");
-    sort_heap(a);
-    printf("\nAfter heap sort : ");
+    printf("\nPerforming bubble sort..\n");
+    sort_bubble(a);
+    printf("\nAfter bubble sort : ");
     arr_print(a);
-    
+
     printf("\nTesting..\n");
     if(sort_test(a))
         printf("\nSorting succeeded!");
     else
         printf("\nSorting failed!");
-    
+
     printf("\n");
     arr_free(a);
     return 0;
