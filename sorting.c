@@ -204,13 +204,64 @@ void sort_quick(Array *arr){
     quick_sort(arr, 0, arr_size(arr) - 1);
 }
 
+// Merge sort
+// =========================
+//
+
+static void sorted_merge(Array *arr, uint64_t l, uint64_t mid, uint64_t r, Array *c){
+    uint64_t i = l, j = mid + 1, k = 0;
+    while(i <= mid && j <= r){
+        if(arr_at(arr, i) <= arr_at(arr, j)){
+            arr_at(c, k) = arr_at(arr, i);
+            i++;
+        }
+        else{
+            arr_at(c, k) = arr_at(arr, j);
+            j++;
+        }
+        k++;
+    }
+    uint64_t restStart = 1, restEnd = 0;
+
+    if(i > mid && j <= r){
+        restStart = j;
+        restEnd = r;
+    }
+    else if(i <= mid && j > r){
+        restStart = i;
+        restEnd = mid;
+    }
+    for(uint64_t m = restStart;m <= restEnd;m++){
+        arr_at(c, k) = arr_at(arr, m);
+        k++;
+    }
+    for(uint64_t m = 0;m < k;m++){
+        arr_at(arr, m + l) = arr_at(c, m);
+    }
+}
+
+void merge_sort(Array *arr, uint64_t l, uint64_t r, Array *aux){
+    if(r <= l)
+        return;
+    uint64_t mid = (l + r)/2;
+    merge_sort(arr, l, mid, aux);
+    merge_sort(arr, mid+1, r, aux);
+    sorted_merge(arr, l, mid, r, aux);
+}
+
+void sort_merge(Array *ar){
+    Array *aux = arr_new(arr_size(ar));
+    merge_sort(ar, 0, arr_size(ar) - 1, aux);
+    arr_free(aux);
+}
+
 int main(){
     Array *a = arr_create();
-    const char *sortString = "quick";
+    const char *sortString = "merge";
     //printf("\nBefore %s sort : ", sortString);
     //arr_print(a);
     printf("\nPerforming %s sort..\n", sortString);
-    sort_quick(a);
+    sort_merge(a);
     //printf("\nAfter %s sort : ", sortString);
     //arr_print(a);
 
