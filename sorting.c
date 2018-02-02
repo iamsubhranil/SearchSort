@@ -89,39 +89,26 @@ void sort_selection(Array *arr){
 // =============================
 //
 
-static void heap_create2(Array *arr, uint64_t size){
-    uint64_t numChild = 1, lastLevel = 0;
-    while(lastLevel + 3*numChild < size){
-        lastLevel += numChild;
-        numChild *= 2;
+static void heap_create(Array *arr){
+    uint64_t i = 0;
+    Array *b = arr_new(arr_size(arr));
+    while(i < arr_size(arr)){
+        arr_at(b, i) = arr_at(arr, i);
+        uint64_t j = i;
+        while(j > 0){
+            uint64_t parent = (j + 1) / 2 - 1;
+            if(arr_at(b, j) < arr_at(b, parent)){
+                swap(&arr_at(b, j), &arr_at(b, parent));
+                j = parent;
+            }
+            else
+                break;
+        }
+        i++;
     }
-outerwhile:;
-           uint64_t start = lastLevel;
-           while(1){
-               uint64_t children = 0;
-               while(children < numChild){
-                   uint64_t parent = start + children;
-                   uint64_t leftChild = parent * 2 + 1;
-                   uint64_t rightChild = parent * 2 + 2;
-                   int64_t *min = &arr_at(arr, parent);
-                   if(leftChild < size && arr_at(arr, leftChild) < *min){
-                       min = &arr_at(arr, leftChild);
-                   }
-                   if(rightChild < size && arr_at(arr, rightChild) < *min){
-                       min = &arr_at(arr, rightChild);
-                   }
-                   if(*min != arr_at(arr, parent)){
-                       swap(min, &arr_at(arr, parent));
-                       start = lastLevel;
-                       goto outerwhile;
-                   }
-                   children++;
-               }
-               if(start == 0)
-                   break;
-               else
-                   start--;
-           }
+    
+    arr_swap(arr, b);
+    arr_free(b);
 }
 
 void heap_rebuild(Array *arr, uint64_t size){
@@ -150,7 +137,9 @@ void heap_rebuild(Array *arr, uint64_t size){
 }
 
 void sort_heap(Array *arr){
-    heap_create2(arr, arr_size(arr));
+    printf("\nCreating heap..\n");
+    heap_create(arr);
+    printf("\nHeap created..\n");
     Array *sorted = arr_new(arr_size(arr));
     for(uint64_t i = arr_size(arr), j = 0;i > 0;i--, j++){
         arr_at(sorted , j) = arr_at(arr , 0);
@@ -162,6 +151,10 @@ void sort_heap(Array *arr){
     arr_swap(sorted, arr);
     arr_free(sorted);
 }
+
+// Bubble sort
+// =========================
+//
 
 void sort_bubble(Array *arr){
     for(uint64_t i = 0;i < arr_size(arr) - 1;i++){
@@ -175,12 +168,13 @@ void sort_bubble(Array *arr){
 
 int main(){
     Array *a = arr_create();
-    printf("\nBefore bubble sort : ");
-    arr_print(a);
-    printf("\nPerforming bubble sort..\n");
-    sort_bubble(a);
-    printf("\nAfter bubble sort : ");
-    arr_print(a);
+    const char *sortString = "heap";
+    //printf("\nBefore %s sort : ", sortString);
+    //arr_print(a);
+    printf("\nPerforming %s sort..\n", sortString);
+    sort_heap(a);
+    //printf("\nAfter %s sort : ", sortString);
+    //arr_print(a);
 
     printf("\nTesting..\n");
     if(sort_test(a))
