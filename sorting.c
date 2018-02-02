@@ -166,13 +166,51 @@ void sort_bubble(Array *arr){
     }
 }
 
+// Quick sort
+// ======================
+//
+
+uint64_t quick_sort_partition(Array *arr, uint64_t left, uint64_t right){
+    uint64_t loc = left;
+    while(left < right){
+        while(arr_at(arr, loc) <= arr_at(arr, right) && loc < right)
+            right--;
+        if(arr_at(arr, loc) > arr_at(arr, right)){
+            swap(&arr_at(arr, loc), &arr_at(arr, right));
+            loc = right;
+            left++;
+        }
+        while(arr_at(arr, loc) >= arr_at(arr, left) && loc > left)
+            left++;
+        if(arr_at(arr, loc) < arr_at(arr, left)){
+            swap(&arr_at(arr, loc), &arr_at(arr, left));
+            loc = left;
+            right--;
+        }
+    }
+    return loc;
+}
+
+void quick_sort(Array *a, uint64_t low, uint64_t high){
+    if(low < high){
+        uint64_t loc = quick_sort_partition(a, low, high);
+        if(loc != 0)
+            quick_sort(a, low, loc - 1);
+        quick_sort(a, loc + 1, high);
+    }
+}
+
+void sort_quick(Array *arr){
+    quick_sort(arr, 0, arr_size(arr) - 1);
+}
+
 int main(){
     Array *a = arr_create();
-    const char *sortString = "heap";
+    const char *sortString = "quick";
     //printf("\nBefore %s sort : ", sortString);
     //arr_print(a);
     printf("\nPerforming %s sort..\n", sortString);
-    sort_heap(a);
+    sort_quick(a);
     //printf("\nAfter %s sort : ", sortString);
     //arr_print(a);
 
