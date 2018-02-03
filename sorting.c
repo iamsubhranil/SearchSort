@@ -269,29 +269,34 @@ void sort_radix(Array *arr){
         max /= 10; passes++;
     }
 
-    // Create 10 buckets, for digits 0-9
-    Array *buckets[10];
+    // Create 20 buckets, for digits -ve 0-9 and +ve 0-9 respectively
+    Array *buckets[20];
     // Initialize all of them to number_of_elements, just to be on the safe side
     // This can be optimized
-    for(uint64_t i = 0; i < 10 ; i++)
+    for(uint64_t i = 0; i < 20 ; i++)
         buckets[i] = arr_new(arr_size(arr));
 
     uint64_t partExtractor = 10, digitExtractor = 1;
     // Start pass
     while(passes > 0){
         // Pointer to buckets
-        uint64_t bucketPointer[10] = {0};
+        uint64_t bucketPointer[20] = {0};
         // Extraction loop
         for(uint64_t i = 0; i < arr_size(arr) ; i++){
             int64_t element = arr_at(arr, i); // Get the element at ith position
-            uint64_t digit = (element % partExtractor) / digitExtractor; // Extract the digit
+            int64_t digit = ((element < 0 ? -element : element )% partExtractor) / digitExtractor; // Extract the digit
+            if(element >= 0)
+                digit += 10;
+            else
+                digit = 9 - digit;
+            
             arr_at(buckets[digit], bucketPointer[digit]) = element; // Put the element into required bucket
             bucketPointer[digit]++; // Increase the bucketPointer for that digit
         }
 
         // Put them again in the original array
         uint64_t digit = 0, arrPointer = 0, tempPointer = 0;
-        while(digit < 10){
+        while(digit < 20){
             if(tempPointer == bucketPointer[digit]){ // tempPointer should always be less than
                 tempPointer = 0;                    // bucketPointer if the bucket at digit
                 digit++;                            // has atleast one element
@@ -311,6 +316,6 @@ void sort_radix(Array *arr){
     }
     
     // Free the buckets
-    for(uint64_t i = 0; i < 10 ; i++)
+    for(uint64_t i = 0; i < 20 ; i++)
         arr_free(buckets[i]);
 }
