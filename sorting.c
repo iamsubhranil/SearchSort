@@ -255,13 +255,75 @@ void sort_merge(Array *ar){
     arr_free(aux);
 }
 
+// Radix sort (decimal)
+//
+
+void sort_radix(Array *arr){
+    // Find the maximum number
+    int64_t max = arr_at(arr, 0);
+    for(uint64_t i = 1; i < arr_size(arr) ;i++){
+        if(max < arr_at(arr, i))
+            max = arr_at(arr, i);
+    }
+    // Count the number of digits in it, and hence number of passes
+    uint64_t passes = 0;
+    while(max > 0){
+        max /= 10; passes++;
+    }
+
+    // Create 10 buckets, for digits 0-9
+    Array *buckets[10];
+    // Initialize all of them to number_of_elements, just to be on the safe side
+    // This can be optimized
+    for(uint64_t i = 0; i < 10 ; i++)
+        buckets[i] = arr_new(arr_size(arr));
+
+    uint64_t partExtractor = 10, digitExtractor = 1;
+    // Start pass
+    while(passes > 0){
+        // Pointer to buckets
+        uint64_t bucketPointer[10] = {0};
+        // Extraction loop
+        for(uint64_t i = 0; i < arr_size(arr) ; i++){
+            int64_t element = arr_at(arr, i); // Get the element at ith position
+            uint64_t digit = (element % partExtractor) / digitExtractor; // Extract the digit
+            arr_at(buckets[digit], bucketPointer[digit]) = element; // Put the element into required bucket
+            bucketPointer[digit]++; // Increase the bucketPointer for that digit
+        }
+
+        // Put them again in the original array
+        uint64_t digit = 0, arrPointer = 0, tempPointer = 0;
+        while(digit < 10){
+            if(tempPointer == bucketPointer[digit]){ // tempPointer should always be less than
+                tempPointer = 0;                    // bucketPointer if the bucket at digit
+                digit++;                            // has atleast one element
+                continue;
+            }
+
+            // Put the element from bucket to the original array
+            arr_at(arr, arrPointer) = arr_at(buckets[digit], tempPointer);
+            arrPointer++;
+            tempPointer++;
+        }
+
+        // Increment
+        partExtractor *= 10;
+        digitExtractor *= 10;
+        passes--;
+    }
+    
+    // Free the buckets
+    for(uint64_t i = 0; i < 10 ; i++)
+        arr_free(buckets[i]);
+}
+
 int main(){
     Array *a = arr_create();
-    const char *sortString = "merge";
+    const char *sortString = "radix";
     //printf("\nBefore %s sort : ", sortString);
     //arr_print(a);
     printf("\nPerforming %s sort..\n", sortString);
-    sort_merge(a);
+    sort_radix(a);
     //printf("\nAfter %s sort : ", sortString);
     //arr_print(a);
 
