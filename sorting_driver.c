@@ -16,11 +16,12 @@ int main(){
         printf("\n3. Insertion Sort");
         printf("\n4. Quick Sort");
         printf("\n5. Merge Sort");
-        printf("\n6. Heap Sort");
-        printf("\n7. Radix Sort");
-        printf("\n8. Exit : ");
+        printf("\n6. Merge Sort Inplace");
+        printf("\n7. Heap Sort");
+        printf("\n8. Radix Sort");
+        printf("\n9. Exit : ");
         scanf("%" SCNd64, &choice);
-        if(choice < 1 || choice > 8){
+        if(choice < 1 || choice > 9){
             printf("\n[Error] Wrong choice!\n");
             continue;
         }
@@ -37,10 +38,12 @@ int main(){
             case 5:
                 perform_sort(merge);
             case 6:
-                perform_sort(heap);
+                perform_sort(merge_inplace);
             case 7:
-                perform_sort(radix);
+                perform_sort(heap);
             case 8:
+                perform_sort(radix);
+            case 9:
                 arr_free(a);
                 goto end;
         }

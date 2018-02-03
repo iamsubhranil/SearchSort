@@ -348,6 +348,41 @@ void sort_merge(Array *ar){
     arr_free(aux);
 }
 
+// Merge sort inplace
+// ===================
+//
+
+static void sorted_merge_inplace(Array *source, uint64_t low, uint64_t mid, uint64_t high){
+    uint64_t j = mid + 1;
+    while(low <= mid && j <= high){
+        if(arr_at(source, low) <= arr_at(source, j)){
+            low++;
+        }
+        else{
+            int64_t element = arr_at(source, j);
+            for(uint64_t t = j; t > low ;t--)
+                arr_at(source, t) = arr_at(source, t - 1);
+            arr_at(source, low) = element;
+            low++;
+            j++;
+            mid++;
+        }
+    }
+}
+
+static void merge_sort_inplace(Array *source, uint64_t low, uint64_t high){
+    if(low >= high)
+        return;
+    uint64_t mid = (low + high) / 2;
+    merge_sort_inplace(source, low, mid);
+    merge_sort_inplace(source, mid + 1, high);
+    sorted_merge_inplace(source, low, mid, high);
+}
+
+void sort_merge_inplace(Array *source){
+    merge_sort_inplace(source, 0, arr_size(source) - 1);
+}
+
 // Radix sort (decimal)
 //
 
