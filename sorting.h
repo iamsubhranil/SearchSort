@@ -9,3 +9,6 @@ void sort_selection(Array *arr);
 void sort_merge(Array *arr);
 void sort_heap(Array *arr);
 void sort_radix(Array *arr);
+
+// Method to check if an array is sorted
+uint8_t sort_test(Array *arr);
