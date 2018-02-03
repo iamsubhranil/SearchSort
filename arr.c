@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <inttypes.h>
+#include <time.h>
 
 Array* arr_new(uint64_t a){
     Array *arr = (Array *)malloc(sizeof(Array));
@@ -39,6 +40,7 @@ recheck:
         printf("\nRange : ");
         scanf("%" SCNd64, &range);
         printf("\nGenerating %" PRIu64 " random elements..\n", arr->count);
+        srand48(time(NULL));
     }
     while(i < arr_size(arr)){
         if(size == 1){
@@ -46,7 +48,7 @@ recheck:
             scanf("%" SCNd64, &inpt);
         }
         else{
-            inpt = random() % range;
+            inpt = ((lrand48() << 16) | lrand48()) % range;
         }
         arr_at(arr, i) = inpt;
         i++;
