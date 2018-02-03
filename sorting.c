@@ -44,7 +44,7 @@ void sort_insertion(Array *arr){
             else
                 break;
         }
-        uint64_t p = j + 1;
+        uint64_t p = j == arr_size(arr) - 1 ? j : j + 1;
         if(allShift)
             shiftpos = 0;
         else
@@ -111,7 +111,7 @@ static void heap_create(Array *arr){
     arr_free(b);
 }
 
-void heap_rebuild(Array *arr, uint64_t size){
+static void heap_rebuild(Array *arr, uint64_t size){
     if(size == 1)
         return;
     uint64_t j = 0;
@@ -137,9 +137,7 @@ void heap_rebuild(Array *arr, uint64_t size){
 }
 
 void sort_heap(Array *arr){
-    printf("\nCreating heap..\n");
     heap_create(arr);
-    printf("\nHeap created..\n");
     Array *sorted = arr_new(arr_size(arr));
     for(uint64_t i = arr_size(arr), j = 0;i > 0;i--, j++){
         arr_at(sorted , j) = arr_at(arr , 0);
@@ -170,7 +168,7 @@ void sort_bubble(Array *arr){
 // ======================
 //
 
-uint64_t quick_sort_partition(Array *arr, uint64_t left, uint64_t right){
+static uint64_t quick_sort_partition(Array *arr, uint64_t left, uint64_t right){
     uint64_t loc = left;
     while(left < right){
         while(arr_at(arr, loc) <= arr_at(arr, right) && loc < right)
@@ -191,7 +189,7 @@ uint64_t quick_sort_partition(Array *arr, uint64_t left, uint64_t right){
     return loc;
 }
 
-void quick_sort(Array *a, uint64_t low, uint64_t high){
+static void quick_sort(Array *a, uint64_t low, uint64_t high){
     if(low < high){
         uint64_t loc = quick_sort_partition(a, low, high);
         if(loc != 0)
@@ -240,7 +238,7 @@ static void sorted_merge(Array *arr, uint64_t l, uint64_t mid, uint64_t r, Array
     }
 }
 
-void merge_sort(Array *arr, uint64_t l, uint64_t r, Array *aux){
+static void merge_sort(Array *arr, uint64_t l, uint64_t r, Array *aux){
     if(r <= l)
         return;
     uint64_t mid = (l + r)/2;
@@ -315,25 +313,4 @@ void sort_radix(Array *arr){
     // Free the buckets
     for(uint64_t i = 0; i < 10 ; i++)
         arr_free(buckets[i]);
-}
-
-int main(){
-    Array *a = arr_create();
-    const char *sortString = "radix";
-    //printf("\nBefore %s sort : ", sortString);
-    //arr_print(a);
-    printf("\nPerforming %s sort..\n", sortString);
-    sort_radix(a);
-    //printf("\nAfter %s sort : ", sortString);
-    //arr_print(a);
-
-    printf("\nTesting..\n");
-    if(sort_test(a))
-        printf("\nSorting succeeded!");
-    else
-        printf("\nSorting failed!");
-
-    printf("\n");
-    arr_free(a);
-    return 0;
 }
