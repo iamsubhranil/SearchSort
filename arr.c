@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <inttypes.h>
 #include <time.h>
+#include <string.h>
 
 Array* arr_new(uint64_t a){
     Array *arr = (Array *)malloc(sizeof(Array));
@@ -78,4 +79,10 @@ void arr_swap(Array *arr1, Array *arr2){
     int64_t *val = arr_elements(arr1);
     arr_elements(arr1) = arr_elements(arr2);
     arr_elements(arr2) = val;
+}
+
+Array* arr_copy(Array *orig){
+    Array *n = arr_new(arr_size(orig));
+    memcpy(n->values, orig->values, sizeof(int64_t) * arr_size(orig));
+    return n;
 }
