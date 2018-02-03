@@ -3,12 +3,26 @@
 #include <stdio.h>
 #include <inttypes.h>
 
+/* Tests whether a given array is sorted in ascending
+ * order of magnitude
+ * ==================================================
+ * This test is performed by comparing two sequential
+ * elements of the given array. If the array is sorted
+ * in ascending order, the item with at lower index
+ * should be lesser than or equal to the item at
+ * the upper index.
+ */
 uint8_t sort_test(Array *arr){
-    uint64_t i = 0;
+    uint64_t i = 0; // Intiate at the lowest index
+    
+    // Since we are comparing present element
+    // to the next (i.e. (present + 1)th) element,
+    // the loop should only continue till the
+    // penultimte element.
     while(i < (arr_size(arr) - 1)){
-        if(arr_at(arr, i) <= arr_at(arr, i + 1))
-            i++;
-        else{
+        if(arr_at(arr, i) <= arr_at(arr, i + 1)) // The items are in ascending order
+            i++; // Continue
+        else{ // The items are not in ascending order
             printf("\nElement %" PRId64 " expected after %" PRId64 "!", arr_at(arr, i), arr_at(arr, i+1));
             return 0;
         }
@@ -16,58 +30,137 @@ uint8_t sort_test(Array *arr){
     return 1;
 }
 
+// Swaps to elements at the given pointers
 static inline void swap(int64_t *p1, int64_t *p2){
     int64_t p3 = *p1;
     *p1 = *p2;
     *p2 = p3;
 }
 
-// Insertion sort
-// =========================
-//
+/* Insertion sort
+ * =========================
+ * This type of sorting is performed using an auxiliary
+ * array and by sorted insertion in that array.
+ * Consider having two arrays, A and B, A being the array
+ * to be sorted, B is an auxiliary array of equal size. At 
+ * first, the first item from A is picked an placed as
+ * the first item of B. Now, the second item from A
+ * is picked and compared with the item presently at
+ * B to determine whether it will follow or precede the
+ * item. Since the sorting is in ascending order, if the
+ * new item is less than the old item, then the old item
+ * is shifted to one place right and the new item is
+ * placed in front of it in B. This method is iteratively
+ * continued for all items present at A, and finally
+ * B becomes the sorted array.
+ */
 
 void sort_insertion(Array *arr){
-    Array *out = arr_new(arr_size(arr));
-    arr_at(out, 0) = arr_at(arr, 0);
+    Array *out = arr_new(arr_size(arr)); // Initialize the auxiliary array with same size
+    arr_at(out, 0) = arr_at(arr, 0); // Place the first element
+    // This loop will start at index 1, since index 0 is already copied,
+    // and continue till all the items of input array is traversed
     for(uint64_t j = 1;j < arr_size(arr);j++){
-        int64_t k = arr_at(arr, j);
-        uint64_t i = j - 1, shiftpos = 0;
+        int64_t k = arr_at(arr, j); // Get the element at present index
+        
+        // 'i' denotes the last position till which the auxiliary array 'out'
+        // is full. If the present index of traversal for the input array is 'j',
+        // then previous 'j' items have already been put into place at 'out', i.e.
+        // the last index is 'j - 1'.
+        uint64_t i = j - 1;
+        
+        // 'shiftPos' denotes the position of insertion of 'k' at 'out',
+        // i.e. the position upto which the items of 'out' have to be rightshifted
+        // from the end.
+        uint64_t shiftpos = 0;
+        
+        // Now there might be a case where 'k' is going to be the lowest item at 'out'.
+        // We need to know if 'k' will be placed at 0th index in 'out', and all the 
+        // subsequent elements will be shifted towards right. Since we're working with
+        // unsigned integers, we can't really flag it by setting 'i' to '-1', hence
+        // this 8 bit value will act as boolean variable to infrom us for that particular
+        // case.
         uint8_t allShift = 0;
+        
+        // Continue eternally ;)
         while(1){
+            // The item at hand is less than the item at the 'i'th index
+            // of 'out', hence we need to decrement 'i'
             if(k < arr_at(out, i)){
-                if(i == 0){
+                if(i == 0){ // This is the special case.
+                            // 'i' is already 0. Decrementing it anymore
+                            // will make it UINT64_MAX. Hence we set the
+                            // 'allShift' flag and break out of the loop.
                     allShift = 1;
                     break;
                 }
                 i = i - 1;
             }
+            // The item at hand is greater than the item at the 'i'th
+            // index of 'out', hence we need to insert it at the 'i+1'th
+            // index
             else
                 break;
         }
-        uint64_t p = j == arr_size(arr) - 1 ? j : j + 1;
-        if(allShift)
+
+        // This variable denotes the upper limit of the right-shifting
+        // madness at 'out'. By previous logic, we've already placed
+        // 'j' items in 'out', and going to insert a new one,
+        // making the size of out 'j+1', and its end index will be 'j'.
+        // Hence the items which will be rightshifted, should be
+        // rightshifted from 'shiftPos' to 'j', or in C,
+        // 'while(shiftPos < j)'. Since in our case, 'shiftPos'
+        // and 'j' are constants for this context, we copy 'j' to
+        // another variable 'p', and move it downwards towards 'shiftPos'.
+        uint64_t p = j;
+
+        if(allShift) // All items are to be shifted,
+                    // hence the new item is going to be inserted
+                    // at index 0
             shiftpos = 0;
-        else
+        else // 'k' is greater than the item at 'i' in 'out',
+            // hence it is going to be inserted at index 'i+1'
             shiftpos = i + 1;
+
+        // Rightshift loop
         while(p > shiftpos){
+            // Just copy the element at (present - 1)th index
+            // to the present index
             arr_at(out, p) = arr_at(out, p - 1);
+            // Decrement the pointer
             p--;
         }
+        // Finally, place the item at hand, i.e. 'k' to the
+        // auxiliary array 'out' at 'shiftPos'.
         arr_at(out, shiftpos) = k;
     }
 
     // Swap the array to make it look like inplace ;)
     arr_swap(arr, out);
+    // Free the auxiliary array
     arr_free(out);
 }
 
-// Selection sort
-// ===================
-//
+/* Selection sort
+ * ===================
+ * This type of sorting works by selecting
+ * the minimum element of the rest of the array
+ * at each iteration and placing it in the
+ * present index.
+ *
+ */
 
 void sort_selection(Array *arr){
+    // Continue till the penultimate index,
+    // since even the item at the last index
+    // will automatically be swapped with it
+    // if required in the inner loop
     for(uint64_t i = 0;i < arr_size(arr) - 1;i++){
-        // Select minimum
+        
+        // Find the position of the minimum element
+        // from the rest of the array, i.e.
+        // from 'i' to 'size_of_the_array', and
+        // store it in 'minpos'
         uint64_t j = i, minpos = i;
         int64_t min = arr_at(arr, i);
         while(j < arr_size(arr)){
@@ -78,7 +171,9 @@ void sort_selection(Array *arr){
             j++;
         }
 
-        // Swap
+        // If the item at present index is not
+        // the minimum in the rest of the array,
+        // swap it with the one that is.
         if(i != minpos){
             swap(&arr_at(arr, i), &arr_at(arr, minpos));
         }
