@@ -1,4 +1,5 @@
 #include "searching.h"
+#include "sorting.h"
 #include <stdio.h>
 #include <stdint.h>
 #include <inttypes.h>
@@ -18,10 +19,22 @@ choice:
         goto choice;
     }
     SearchResult s;
-    if(c == 1)
+    if(c == 1){
+        printf("\nPerforming linear search..\n");
         s = search_linear(arr, el);
-    else
+    }
+    else{
+        printf("\nChecking if the given array is sorted..\n");
+        if(sort_test(arr)){
+            printf("\nGiven array is already sorted!\n");
+        }
+        else{
+            printf("\nGiven array is not sorted!\nSorting given array using quick sort method..\n");
+            sort_quick(arr);
+        }
+        printf("\nPerforming binary search..\n");
         s = search_binary(arr, el);
+    }
     if(s.found){
         printf("\nElement %" PRId64 " found at position %" PRId64"!", el, s.position+1);
     }
