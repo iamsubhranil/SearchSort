@@ -49,8 +49,17 @@ int main(){
         printf("\nTesting sort..\n");
         if(sort_test(a))
             printf("\nSorting succeeded [took %g seconds]!", sec);
-        else
+        else{
             printf("\nSorting failed [took %g seconds]!", sec);
+        }
+        printf("\n\nDo you want to see the result ? \n1. Yes \n2. No : ");
+        scanf("%" SCNd64, &choice);
+        if(choice == 1){
+            printf("\nInput array : ");
+            arr_print(source);
+            printf("\nOutput array : ");
+            arr_print(a);
+        }
         arr_free(a);
         printf("\n");
     }
