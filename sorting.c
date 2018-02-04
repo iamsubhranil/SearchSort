@@ -459,12 +459,14 @@ void sort_merge_inplace(Array *source){
 // Radix sort (decimal)
 //
 
+#define el_abs(x) (x < 0 ? -x : x)
+
 void sort_radix(Array *arr){
     // Find the maximum number
-    int64_t max = arr_at(arr, 0);
+    int64_t max = el_abs(arr_at(arr, 0));
     for(uint64_t i = 1; i < arr_size(arr) ;i++){
-        if(max < arr_at(arr, i))
-            max = arr_at(arr, i);
+        if(max < el_abs(arr_at(arr, i)))
+            max = el_abs(arr_at(arr, i));
     }
     // Count the number of digits in it, and hence number of passes
     uint64_t passes = 0;
