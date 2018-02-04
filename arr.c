@@ -53,6 +53,8 @@ recheck:
         }
         else{
             inpt = ((lrand48() << 16) | lrand48()) % range; // generate a 64bit random value
+            if(lrand48() % 2 == 0)
+                inpt = -inpt;
         }
         arr_at(arr, i) = inpt;
         i++;
