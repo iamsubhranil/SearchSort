@@ -11,6 +11,7 @@ void sort_heap(Array *arr);
 void sort_radix(Array *arr);
 
 void sort_merge_inplace(Array *arr);
+void sort_insertion_inplace(Array *arr);
 
 // Method to check if an array is sorted
 uint8_t sort_test(Array *arr);

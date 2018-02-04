@@ -141,6 +141,36 @@ void sort_insertion(Array *arr){
     arr_free(out);
 }
 
+// Insertion Sort Inplace
+// ======================
+//
+
+void sort_insertion_inplace(Array *arr){
+    for(uint64_t i = 1; i < arr_size(arr) ;i++){
+        int64_t item = arr_at(arr, i);
+        uint64_t lastIndex = i - 1;
+        uint8_t allShift = 0;
+        while(item < arr_at(arr, lastIndex)){
+            if(lastIndex == 0){
+                allShift = 1;
+                break;
+            }
+            lastIndex--;
+        }
+        uint64_t shiftPos;
+        if(allShift)
+            shiftPos = 0;
+        else
+            shiftPos = lastIndex + 1;
+        uint64_t curPos = i;
+        while(curPos > shiftPos){
+            arr_at(arr, curPos) = arr_at(arr, curPos - 1);
+            curPos--;
+        }
+        arr_at(arr, shiftPos) = item;
+    }
+}
+
 /* Selection sort
  * ===================
  * This type of sorting works by selecting
