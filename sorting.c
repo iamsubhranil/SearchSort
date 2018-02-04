@@ -461,6 +461,8 @@ void sort_merge_inplace(Array *source){
 
 #define el_abs(x) (x < 0 ? -x : x)
 
+//#define SPACE_CONSTRAINED_RADIX
+
 void sort_radix(Array *arr){
     // Find the maximum number
     int64_t max = el_abs(arr_at(arr, 0));
@@ -479,7 +481,11 @@ void sort_radix(Array *arr){
     // Initialize all of them to number_of_elements, just to be on the safe side
     // This can be optimized
     for(uint64_t i = 0; i < 20 ; i++)
+#ifdef SPACE_CONSTRAINED_RADIX
+        buckets[i] = NULL;
+#else
         buckets[i] = arr_new(arr_size(arr));
+#endif
 
     uint64_t partExtractor = 10, digitExtractor = 1;
     // Start pass
@@ -494,7 +500,10 @@ void sort_radix(Array *arr){
                 digit += 10;
             else
                 digit = 9 - digit;
-            
+#ifdef SPACE_CONSTRAINED_RADIX
+            if(buckets[digit] == NULL)
+                buckets[digit] = arr_new(arr_size(arr));
+#endif
             arr_at(buckets[digit], bucketPointer[digit]) = element; // Put the element into required bucket
             bucketPointer[digit]++; // Increase the bucketPointer for that digit
         }
@@ -522,5 +531,8 @@ void sort_radix(Array *arr){
     
     // Free the buckets
     for(uint64_t i = 0; i < 20 ; i++)
-        arr_free(buckets[i]);
+#ifdef SPACE_CONSTRAINED_RADIX
+        if(buckets[i] != NULL)
+#endif
+            arr_free(buckets[i]);
 }
