@@ -24,6 +24,7 @@ int main(){
         scanf("%" SCNd64, &choice);
         if(choice < 1 || choice > 10){
             printf("\n[Error] Wrong choice!\n");
+            arr_free(a);
             continue;
         }
         clock_t clockStart = 0, clockEnd = 0;
