@@ -141,32 +141,75 @@ void sort_insertion(Array *arr){
     arr_free(out);
 }
 
-// Insertion Sort Inplace
-// ======================
-//
+/* Insertion Sort Inplace
+ * ======================
+ * This type of insertion sort does not use an auxiliary 
+ * array to store the sorted elements. Rather, for each
+ * sorted element, it is inserted into the input array 
+ * directly. This does not increase the time complexity of
+ * the algorithm, but rather decreases the space complexity 
+ * to O(1).
+ *
+ */
 
 void sort_insertion_inplace(Array *arr){
+    // Start from index 1, i.e. leave the 0th
+    // element as it is, since it will be
+    // automatically compared and shifted as required.
     for(uint64_t i = 1; i < arr_size(arr) ;i++){
-        int64_t item = arr_at(arr, i);
+        int64_t item = arr_at(arr, i); // Get the element to sort
+        // This is the index upto which the input
+        // array is already sorted
         uint64_t lastIndex = i - 1;
+        // A flag to denote if the element to be
+        // inserted at 0th index, i.e. all other
+        // already sorted elements have to be
+        // rightshifted
         uint8_t allShift = 0;
+        // Find the index in which the element
+        // is going to be inserted. This loop performs
+        // actual sorting.
+        //
+        // If the item at hand is less than the
+        // last sorted item, then it will be inserted
+        // before the later, i.e. its index will be
+        // decremented. This will be continued
+        // until such an element is found whose
+        // magnitude is lesser than the one at hand.
         while(item < arr_at(arr, lastIndex)){
-            if(lastIndex == 0){
+            if(lastIndex == 0){ // But present index
+                                // is already 0, hence
+                                // all previously sorted
+                                // items have to be shifted
+                                // by 1 position.
                 allShift = 1;
-                break;
+                break; // Exit from the loop
             }
-            lastIndex--;
+            lastIndex--; // Element at hand will be inserted
+                        // before this index
         }
+        // This is the position
+        // i) at which the element at hand is to be inserted
+        // ii) from which all the elements has to be rightshifted
         uint64_t shiftPos;
-        if(allShift)
+        if(allShift) // This flag is set to 1, hence item is to be
+                    // inserted at 0th index
             shiftPos = 0;
         else
-            shiftPos = lastIndex + 1;
-        uint64_t curPos = i;
+            shiftPos = lastIndex + 1; // Item is to be inserted
+                                    // at 'lastIndex+1', since
+                                    // 'lastIndex' is already
+                                    // decremented in the
+                                    // while loop
+        uint64_t curPos = i; // Create a copy of present position
+
+        // Rightshift loop
         while(curPos > shiftPos){
             arr_at(arr, curPos) = arr_at(arr, curPos - 1);
             curPos--;
         }
+
+        // Inserted the element
         arr_at(arr, shiftPos) = item;
     }
 }
