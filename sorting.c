@@ -461,7 +461,7 @@ void sort_merge_inplace(Array *source){
 
 #define el_abs(x) (x < 0 ? -x : x)
 
-//#define SPACE_CONSTRAINED_RADIX
+#define SPACE_CONSTRAINED_RADIX
 
 void sort_radix(Array *arr){
     // Find the maximum number
