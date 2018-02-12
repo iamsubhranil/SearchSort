@@ -19,6 +19,51 @@ void arr_free(Array *a){
     free(a); // free the pointer itself
 }
 
+static void gen_rand_input(Array *arr){
+    int64_t type;
+rechoice:
+    printf("\nRandom input type");
+    printf("\n=================");
+    printf("\n1. Best Case");
+    printf("\n2. Average Case");
+    printf("\n3. Worst Case : ");
+    scanf("%" SCNd64, &type);
+    if(type > 3 || type < 1){
+        printf("\nWrong choice!");
+        goto rechoice;
+    }
+    int64_t range;
+    printf("\nRandom input range : ");
+    scanf("%" SCNd64, &range);
+
+    printf("\nGenerating %" PRIu64 " random elements..\n", arr->count);
+    srand48(time(NULL)); // Reset the random seed
+
+    uint64_t i = 1;
+    int64_t input = ((lrand48() << 16) | lrand48()) % range; // generate a 64bit random value
+    if(lrand48() % 2 == 0)
+        input = -input;
+    arr_at(arr, 0) = input;
+
+    while(i < arr_size(arr)){
+        switch(type){
+            case 1:
+                input++;
+                break;
+            case 2:
+                input = ((lrand48() << 16) | lrand48()) % range; // generate a 64bit random value
+                if(lrand48() % 2 == 0)
+                    input = -input;
+                break;
+            case 3:
+                input--;
+                break;
+        }
+        arr_at(arr, i) = input;
+        i++;
+    }
+}
+
 // Create an array by user's choice
 Array* arr_create(){
     uint64_t size;
@@ -39,25 +84,17 @@ recheck:
         goto recheck;
     }
     uint64_t i = 0;
-    int64_t inpt, range;
+    int64_t inpt;
     if(size == 2){
-        printf("\nRange : ");
-        scanf("%" SCNd64, &range);
-        printf("\nGenerating %" PRIu64 " random elements..\n", arr->count);
-        srand48(time(NULL)); // Reset the random seed
+        gen_rand_input(arr);
     }
-    while(i < arr_size(arr)){
-        if(size == 1){
+    else{
+        while(i < arr_size(arr)){
             printf("\nElement %" PRIu64 " : ", i+1);
             scanf("%" SCNd64, &inpt);
+            arr_at(arr, i) = inpt;
+            i++;
         }
-        else{
-            inpt = ((lrand48() << 16) | lrand48()) % range; // generate a 64bit random value
-            if(lrand48() % 2 == 0)
-                inpt = -inpt;
-        }
-        arr_at(arr, i) = inpt;
-        i++;
     }
     return arr;
 }
